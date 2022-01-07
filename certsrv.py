@@ -56,7 +56,7 @@ class Certsrv(object):
         username: The username for authentication.
         password: The password for authentication.
         auth_method: The chosen authentication method. Either 'basic' (the default),
-            'ntlm', 'cert' (SSL client certificate) or 'gssapi' (GSSAPI, Kerberos)
+            'ntlm', 'cert' (ssl client certificate), 'gssapi' (GSSAPI), or 'kerberos_auth' (Kerberos).
         cafile: A PEM file containing the CA certificates that should be trusted.
         timeout: The timeout to use against the CA server, in seconds.
             The default is 30.
@@ -104,6 +104,9 @@ class Certsrv(object):
         elif self.auth_method == "gssapi":
             from requests_gssapi import HTTPSPNEGOAuth
             self.session.auth = HTTPSPNEGOAuth()
+        elif self.auth_method == "kerberos_auth":
+            from requests_kerberos import HTTPKerberosAuth, REQUIRED
+            self.session.auth = HTTPKerberosAuth(mutual_authentication=REQUIRED, force_preemptive=True)
         else:
             self.session.auth = (username, password)
 
@@ -363,7 +366,7 @@ def get_cert(server, csr, template, username, password, encoding="b64", **kwargs
         encoding: The desired encoding for the returned certificate.
             Possible values are 'bin' for binary and 'b64' for Base64 (PEM).
         auth_method: The chosen authentication method. Either 'basic' (the default),
-            'ntlm', 'cert' (ssl client certificate) or 'gssapi' (GSSAPI, Kerberos).
+            'ntlm', 'cert' (ssl client certificate), 'gssapi' (GSSAPI), or 'kerberos_auth' (Kerberos).
         cafile: A PEM file containing the CA certificates that should be trusted.
 
     Returns:
@@ -401,7 +404,7 @@ def get_existing_cert(server, req_id, username, password, encoding="b64", **kwar
         encoding: The desired encoding for the returned certificate.
             Possible values are 'bin' for binary and 'b64' for Base64 (PEM).
         auth_method: The chosen authentication method. Either 'basic' (the default),
-            'ntlm', 'cert' (ssl client certificate) or 'gssapi' (GSSAPI, Kerberos).
+            'ntlm', 'cert' (ssl client certificate), 'gssapi' (GSSAPI), or 'kerberos_auth' (Kerberos).
         cafile: A PEM file containing the CA certificates that should be trusted.
 
     Returns:
@@ -434,7 +437,7 @@ def get_ca_cert(server, username, password, encoding="b64", **kwargs):
         encoding: The desired encoding for the returned certificate.
             Possible values are 'bin' for binary and 'b64' for Base64 (PEM).
         auth_method: The chosen authentication method. Either 'basic' (the default),
-            'ntlm', 'cert' (ssl client certificate) or 'gssapi' (GSSAPI, Kerberos).
+            'ntlm', 'cert' (ssl client certificate), 'gssapi' (GSSAPI), or 'kerberos_auth' (Kerberos).
         cafile: A PEM file containing the CA certificates that should be trusted.
 
     Returns:
@@ -463,7 +466,7 @@ def get_chain(server, username, password, encoding="bin", **kwargs):
         encoding: The desired encoding for the returned certificates.
             Possible values are 'bin' for binary and 'b64' for Base64 (PEM).
         auth_method: The chosen authentication method. Either 'basic' (the default),
-            'ntlm', 'cert' (ssl client certificate) or 'gssapi' (GSSAPI, Kerberos).
+            'ntlm', 'cert' (ssl client certificate), 'gssapi' (GSSAPI), or 'kerberos_auth' (Kerberos).
         cafile: A PEM file containing the CA certificates that should be trusted.
 
     Returns:
@@ -490,7 +493,7 @@ def check_credentials(server, username, password, **kwargs):
         username: The username for authentication.
         pasword: The password for authentication.
         auth_method: The chosen authentication method. Either 'basic' (the default),
-            'ntlm', 'cert' (ssl client certificate) or 'gssapi' (GSSAPI, Kerberos).
+            'ntlm', 'cert' (ssl client certificate), 'gssapi' (GSSAPI), or 'kerberos_auth' (Kerberos).
         cafile: A PEM file containing the CA certificates that should be trusted.
 
     Returns:
